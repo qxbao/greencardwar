@@ -1,0 +1,40 @@
+@font-face {
+    font-family: 'Radikal';
+    src: url('/fonts/Radikal-Black.otf');
+}
+
+@font-face {
+    font-family: 'Graphik';
+    src: url('/fonts/Graphik-Medium.ttf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Graphik';
+    src: url('/fonts/Graphik-Bold.ttf');
+    font-weight: 500;
+}
+
+* {
+    transition: .5s all;
+}
+
+body {
+    font-family: 'Radikal';
+    overflow: hidden;
+}
+
+
+.graphik {
+    font-family: 'Graphik';
+}
+
+.text-red {
+    color:red;
+    text-shadow: 0 0 2px black;
+}
+
+.text-congrats {
+    color:rgb(17, 175, 17);
+    text-shadow: 0 0 2px black;
+}

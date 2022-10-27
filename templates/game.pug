@@ -1,0 +1,234 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        include essential
+        title Loading title...
+        style.
+            body {
+                background: url('/images/556600.jpg');
+                background-size: cover;
+                background-position: center center;
+                background-repeat: none;
+                color: white;
+            }
+
+            #scoreboardPanel {
+                background: rgb(0,0,0,0.9);
+            }
+            #questionPanel {
+                background: rgb(0,0,0,0.4);
+            }
+            #bossPanel{
+                background: rgb(0,0,0,0.7);
+            }
+            .gameInput {
+                transition: .3s all;
+                outline: none!important;
+                border:1px solid black;
+                padding: .4rem .5rem;
+            }
+
+            input.gameInput {
+                color: #27AE60;
+            }
+
+            input.gameInput:focus {
+                border-color: white;
+                background:black;
+            }
+
+            button.gameInput:hover {
+                background: #cccccc;
+            }
+
+            button.gameInput:active {
+                background: #666666;
+            }
+
+    body
+        .container-fluid(style="height:100vh")
+            .row.h-100
+                .col-5.p-3.d-flex.flex-column.align-items-start#questionPanel
+                    .container#questionContainer
+                        button(onclick="window.location = '/'") < Home
+                        h1 Question 
+                            span#questionId #id
+                            |:
+                        h4#question.graphik loading question...
+                        p Hint: 
+                            span#hint.graphik loading hint...
+                        #res
+                    .mt-auto.w-100
+                        button(onclick="skipQuestion()") Next question
+                        .row
+                            .col-7.pe-0
+                                input.gameInput.w-100#answer(placeholder="Your answer" autocomplete="off")
+                            .col-3.px-0
+                                input.gameInput.w-100#name(placeholder="Name" autocomplete="off")
+                            .col.ps-0
+                                button.gameInput.w-100#submitButton Submit
+                .col-4.p-3#bossPanel
+                    h1.text-center.text-danger.mb-5 BOSS
+                    img(src="/images/boss1.png" alt="").w-50.mx-auto.d-block#bossImg
+                    .progress.rounded-0.mb-3
+                        .progress-bar.graphik#hpbar(style="background:#8b0000; width:100%")
+                    h2.text-center.text-light Luong Hong Duc
+                    p.text-center.fst-italic.graphik Wanna win the greencard? OVER MY DEAD BODY!!! 
+                .col-3.p-3#scoreboardPanel
+                    h1.text-center.text-warning Scoreboard
+                    table.table.table-borderless.text-white.graphik
+                        thead
+                            tr
+                                th.text-center Rank
+                                th.text-center Name
+                                th.text-center Points
+                        tbody.text-center#ranking
+        script.
+            const delay = ms => { return new Promise(res => setTimeout(res, ms)); }
+
+            const skipQuestion = () => {
+                let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                localStorage.setItem('lastQuestion', String(lastQuestion + 1));
+                load();
+            }
+
+            const setHp = (hp, max) => {
+                if (hp <= 0) {
+                    $('#bossImg').attr('src', '/images/boss1_dead.png')
+                }
+                $('#hpbar').css('width', (hp / max) * 100 + "%");
+                $('#hpbar').text(`${hp} / ${max}`);
+            }
+
+            const ranking = scoreboard => {
+                if (Object.keys(scoreboard).length == 0) {
+                    return false;
+                }
+                const foo = [];
+                for(let name in scoreboard) {
+                    foo.push({name: name, points: scoreboard[name]})
+                }
+                const bar = foo.sort(function(a, b){
+                    return b.points - a.points;
+                });
+                $('#ranking').html('');
+                for(let rank in bar) {
+                    $('#ranking').append(`
+                    <tr>
+                        <th scope="row">${parseInt(rank) + 1}</th>
+                        <td>${bar[rank].name}</td>
+                        <td>${bar[rank].points}</td>
+                    </tr>`);
+                }
+            }
+
+            const load = () => {
+                let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                let set = localStorage.getItem('set');
+                $.get('/questionSet/' + set +'.json', (res) => {
+                    if (lastQuestion + 1 > res.set.length) {
+                        document.title = "Game over!";
+                        $('#questionPanel').html("<h2 class='text-info'>It looks like the game is over. We'll automatically redirect you to the summary page in a few seconds...<br>If we don't, <a class='text-info' href='/summary'>click me</a> to do it manually.</h2>");
+                        setTimeout(() => {
+                            window.location.href = "/summary";
+                        }, 5000)
+                    }
+
+                    if (lastQuestion == 0) {
+                        //- set up game
+                        localStorage.setItem('hp', String(res.hp));
+                    }
+
+                    let hp = parseInt(localStorage.getItem('hp'));
+                    document.title = 'Question ' + (lastQuestion + 1);
+                    $('#questionId').text(lastQuestion + 1);
+                    lastQuestion + 1 <= res.set.length ? $('#question').text(res.set[lastQuestion].question) : true;
+                    lastQuestion + 1 <= res.set.length ? $('#hint').text(res.set[lastQuestion].hint ? res.set[lastQuestion].hint : "No") : true;
+                    setHp(hp, res.hp)
+                    // ranking players
+                    ranking(scoreboard);
+                }, 'json');
+            } 
+
+            $(document).ready(() => {
+                try {
+                    let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                    let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                    let set = localStorage.getItem('set');
+
+                    if(!scoreboard || !Number.isInteger(lastQuestion) || !set) {
+                        document.title = "ERROR";
+                        return $('#questionPanel').html("<h2 class='p-3 bg-black text-danger'>Your game haven't been setup properly or something went wrong. You should create a new game or contact the developer for further information.<br><a class='text-danger' href='/'>Homepage</a></h2>");
+                    }
+                }
+                catch{
+                    console.error;
+                }
+
+                load();
+
+                $("#submitButton").click(() => {
+                    let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                    let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                    let set = localStorage.getItem('set');
+
+                    const answer = ($("#answer").val()).toLowerCase();
+                    const name = $("#name").val();
+                    $("#name").val('');
+                    $("#answer").val('')
+                    if (!answer || !name) {
+                        return $("#res").html("<p class='text-red'>Answer & name fields are required.</p>")
+                    }
+                    $.get('/questionSet/' + set +'.json', async (res) => {
+                        for(let ans of res.set[lastQuestion].answer) {
+                            if (ans.toLowerCase() == answer) {
+                                const hp = parseInt(localStorage.getItem('hp'));
+                                localStorage.setItem('lastQuestion', String(lastQuestion + 1));
+                                Number.isInteger(scoreboard[name]) ? scoreboard[name] ++ : scoreboard[name] = 1;
+                                localStorage.setItem('scoreboard', JSON.stringify(scoreboard));
+                                $('#bossImg').attr('src', '/images/boss1_dead.png')
+                                if (hp > 0) {
+                                    await $('#bossImg').attr('src', '/images/boss1_angry.png');
+                                    $('#bossImg').effect("shake", {times:4}, 1000).promise().then(() => {
+                                        $('#bossImg').attr('src', '/images/boss1.png');
+                                    });
+                                    localStorage.setItem('hp', String(hp - 100));
+                                }
+                                else {
+                                    localStorage.setItem('hp', '0');
+                                }
+                                $('#res').html('');
+                                $('#res').append('<p class="text-congrats">Your answer ('+ answer +') is right, '+name+'!</p>');
+                                await delay(1000);
+                                $('#res').append('<img src="/images/congrats.jpg" class="w-50">');
+                                await delay(500);
+                                $('#res').append('<p class="text-congrats">Next question in 5 seconds</p>');
+                                setTimeout(() => {
+                                    $('#res').html('');
+                                    load();
+                                },5000)
+                                return true;
+                            }
+                        }
+                        //- fail
+                        localStorage.setItem('lastQuestion', String(lastQuestion + 1));
+                        Number.isInteger(scoreboard[name]) ? scoreboard[name] -- : scoreboard[name] = -1;
+                        localStorage.setItem('scoreboard', JSON.stringify(scoreboard));
+                        $('#res').html('');
+                        $('#res').append('<p class="text-red">What a pity, '+name+'! Your answer is totally wrong ( _　_||| )</p>');
+                        await delay(1000);
+                        $('#res').append('<img src="/images/boooo.jpg" class="w-50">');
+                        $('#res').append(`<p class="text-red">Acceptable answer(s): ${res.set[lastQuestion].answer.length == 1 ? res.set[lastQuestion].answer.join('') : res.set[lastQuestion].answer.join(', ')}</p>`);
+                        await delay(500);
+                        $('#res').append('<p class="text-red">Next question in 5 seconds</p>');
+                        setTimeout(() => {
+                            $('#res').html('');
+                            load();
+                        },5000)
+                    })
+                })
+            })

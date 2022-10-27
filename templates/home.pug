@@ -1,0 +1,146 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Greencard War
+        include essential
+        style.
+            @keyframes spin {
+                0% {transform: rotateY(0deg);}
+                100% {transform: rotateY(360deg);}
+            }
+
+            body{
+                    background: url('/images/bg1.jpg');
+                    background-size: cover;
+                    background-position: center center;
+                    background-repeat: none;
+                    color: white;
+            }
+
+            #title {
+                color:#2ECC71;
+                text-shadow: 3px 5px black;
+                box-shadow: 0 0 0 4px #2ECC71, 0 0 0 6px black;
+            }
+
+            #card {
+                border:1px solid black;
+                height: 80px;
+                width: 50px;
+                background-color: #409569;
+                background-image: linear-gradient(203deg, #3eb075 0%, #54f8a5 50%); 
+                animation: spin 3s infinite ease-in-out;
+            }
+
+            .button {
+                transition: .2s all;
+                background: #52BE80;
+                border-radius: 3px;
+                padding: .5rem 5rem;
+                font-size: 1.7rem;
+                color: #ededed;
+                border:none;
+                box-shadow: 0 10px #27AE60;
+            }
+
+            .button:disabled, .button:disabled:hover{
+                color: #4d4d4d;
+                background: #e4dede;
+                box-shadow: 0 10px #c5b8b8 !important;
+                transform: none !important;
+            }
+
+            .button:hover {
+                background: #3eb06e;
+                box-shadow: 0 10px #158c47
+            }
+
+            .button:active {
+                box-shadow: none !important;
+                transform: translateY(10px);
+            }
+    body
+        .w-100(style="height: 100vh;")
+            .container.p-5.text-center
+                .display-1.mb-4.fw-bold.text-center
+                    span.pb-3.pt-2.px-5#title GreencardWar
+                .text-center.mb-4
+                    i developed by bao
+                #prize.pb-5
+                    h1.text-center.mb-3
+                        span.px-4.bg-warning.text-black Prize
+                    #card.m-auto.rounded-2
+                #box.my-4
+                    button#continueButton.button.me-4 Continue
+                    button#newGameButton.button NEW GAME
+                a(href="#" style="color: #F9E79F; text-shadow: 0 0 3px black;")#rules Rules
+                .modal.fade#ruleModal(data-bs-backdrop="static")
+                    .modal-dialog.modal-dialog-centered
+                        .modal-content.rounded-1(style="background:#212121")
+                            .modal-header
+                                h2.modal-title Rules
+                                button.btn-close.bg-white(data-bs-dismiss="modal")
+                            .modal-body.text-start.graphik
+                                p
+                                    b 1.
+                                    |  Each question, you have only one chance to submit your answer.
+                                p
+                                    b 2.
+                                    |  There's an in-game boss for you to fight to defeat. Every acceptable answer will decrease the boss's HP by 100.
+                                p
+                                    b 3.
+                                    |  You cannot win unless you have already defeated the boss. Unit 5's boss has 700 HP so basically you have to answer correctly at least 7/12 questions.
+                                p
+                                    b 4.
+                                    |  Right answer, +1 point. Wrong answer, -1 point. Who has the highest point at the end is the winner (in case the boss has been defeated).
+                                p
+                                    b 5.
+                                    |  Whenever you say "Quan Bao is the most handsome man in the world", i give u 1 extra-point for your honesty.
+                                p
+                                    b 6.
+                                    |  You must have at least 1 point to become the winner.
+        script.
+            $(document).ready(() => {
+                
+                try {
+                    let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                    let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                    let set = localStorage.getItem('set');
+                    let hp = parseInt(localStorage.getItem('hp'));
+
+                    if(!scoreboard || !Number.isInteger(lastQuestion) || !set || !Number.isInteger(hp)) {
+                        document.title = "ERROR";
+                        return $('#continueButton').prop('disabled', true);
+                    }
+
+                    $.get('/questionSet/' + set +'.json', (res) => {
+                        if(lastQuestion + 1 > res.set.length) {
+                            return $('#continueButton').click(() => {
+                                window.location = '/summary';
+                            });
+                        }
+                    })
+                }
+                catch{
+                    console.error;
+                }
+                
+                $('#newGameButton').click(function(){
+                    $('#box').html("<p class='text-center'><span class='p-2 bg-black'>Initializing new game...</span></p>");
+                    localStorage.setItem('lastQuestion', '0');
+                    localStorage.setItem('scoreboard', '{}');
+                    localStorage.setItem('set', 'unit5');
+                    setTimeout(() => {
+                        window.location = '/game';
+                    },3000);
+                });
+                $('#continueButton').click(() => {
+                    window.location = '/game';
+                })
+                $('#rules').click(() => {
+                    $('#ruleModal').modal('toggle')
+                });
+            })

@@ -1,0 +1,131 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        include essential
+        title Summary
+        style.
+            body {
+                background-image: url('/images/3264451.jpg');
+                background-size: cover;
+                background-position: top center;
+                background-repeat: no-repeat;
+                color: white;
+            }
+    body
+        .d-flex.align-items-center(style="height:100vh")
+            .container.text-center.p-4#mainpage
+                #result
+                    h1.mb-4 The winner is
+                    h2.mb-4
+                        span.bg-black.p-2#winnerName(style="color:#F4D03F") #winner-name
+                    p because
+                    h3.mb-5#reason #reason
+                    a.d-block.mb-2.text-info(style="text-shadow:0 0 4px black" href="/") Back to homepage
+                .card.w-50.m-auto.rounded-0
+                    .card-body.text-black
+                        h2 Scoreboard
+                        table.table.table-borderless.graphik
+                            thead
+                                tr
+                                    th.text-center Rank
+                                    th.text-center Name
+                                    th.text-center Points
+                            tbody.text-center#ranking
+        script.
+            function delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+            const randomPick = async (arr) => {
+                const rannum = Math.floor(Math.random() * 30) + 50;
+                const colors = ['#CD6155', '#DC7633', '#F4D03F', '#58D68D', '#AED6F1', '#3F00FF', '#8E44AD'];
+                for (let i = 0; i < rannum; i++) {
+                    $('#winnerName').text(arr[i % arr.length]);
+                    $('#winnerName').css('color', colors[i % colors.length])
+                    await delay(100)
+                }
+                $('#reason').text('THEY WON THE LOTTERY :3');
+                $('#picker').remove();
+            }
+
+            const ranking = (scoreboard) => {
+                if (Object.keys(scoreboard).length == 0) {
+                    return false;
+                }
+                const foo = [];
+                for(let name in scoreboard) {
+                    foo.push({name: name, points: scoreboard[name]})
+                }
+                const bar = foo.sort(function(a, b){
+                    return b.points - a.points;
+                });
+                $('#ranking').html('');
+                for(let rank in bar) {
+                    $('#ranking').append(`
+                    <tr>
+                        <th scope="row">${parseInt(rank) + 1}</th>
+                        <td>${bar[rank].name}</td>
+                        <td>${bar[rank].points}</td>
+                    </tr>`);
+                }
+            }
+
+            $(document).ready(async () => {
+                try {
+                    let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                    let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                    let hp = localStorage.getItem('hp');
+                    let set = localStorage.getItem('set');
+                    if(!scoreboard || !Number.isInteger(lastQuestion) || !set || !hp) {
+                        document.title = "ERROR";
+                        return $('#mainpage').html("<h2 class='p-3 bg-black text-danger'>Your game haven't been setup properly or something went wrong. You should create a new game or contact the developer for further information.<br><a class='text-danger' href='/'>Homepage</a></h2>");
+                    }
+                    ranking(scoreboard);
+
+                    await $.get('/questionSet/' + set +'.json', (res) => {
+                        if (lastQuestion + 1 <= res.set.length) {
+                            return $('#mainpage').html("<h2 class='p-3 bg-black text-danger'>Not yet!<br><a class='text-danger' href='/game'>Back to the game</a></h2>");
+                        }
+                    }, 'json')
+
+                    if (hp > 0) {
+                        $('#winnerName').text('nobody');
+                        $('#reason').text('The boss is still alive.')
+                        return true;
+                    }
+                    const foo = [];
+                    for(let name in scoreboard) {
+                        foo.push(scoreboard[name]);
+                    }
+                    const max = Math.max(...foo);
+                    if (max <= 0) {
+                        $('#winnerName').text('nobody');
+                        $('#reason').text('Nobody has more than 0 point');
+                        return true;
+                    }
+
+                    const winners = [];
+
+                    for(let name in scoreboard) {
+                        scoreboard[name] == max ? winners.push(name) : null;
+                    }
+
+                    if (winners.length > 1) {
+                        $('#winnerName').text('nobody');
+                        $('#reason').text('2 or more players earned the same point')
+                        $('#result').append('<button class="mb-4" id="picker">Pick them randomly</button>');
+                        $('#picker').click(() => {
+                            randomPick(winners)
+                        })
+                        return true;
+                    } 
+
+                        $('#winnerName').text(winners[0]);
+                        $('#reason').text('He/she deserves it. Congrats 🎉🥳');
+
+                }
+                catch{
+                    $('#mainpage').html("<h2 class='p-3 bg-black text-danger'>(0002) Your game haven't been setup properly or something went wrong. You should create a new game or contact the developer for further information.<br><a class='text-danger' href='/'>Homepage</a></h2>");
+                }
+            })
