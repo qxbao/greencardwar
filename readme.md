@@ -5,6 +5,8 @@ Một game đơn giản chạy trên Nodejs. Tất cả dữ liệu được lư
 ## Hướng dẫn chạy trên localhost
 Clone project, giải nén chạy file index:
 ```node index.js```, mặc định port 80
+
+Trong folder /public/images còn thiếu file boss1.png, boss1_angry.png, boss1_dead.png, boooo.jpg, congrats.jpg và các background. Vì là file cá nhân nên không chia sẻ, làm ơn tự thêm ảnh tùy thích.
 ## Luật chơi
 - Để chiến thắng cần diệt xong boss, boss chưa chết không xét điểm cá nhân
 - 1 câu trả lời đúng trừ 100 máu boss
