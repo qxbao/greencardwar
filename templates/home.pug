@@ -69,13 +69,16 @@ html(lang="en")
                     span.pb-3.pt-2.px-5#title GreencardWar
                 .text-center.mb-4
                     i developed by bao
-                #prize.pb-5
+                #prize
                     h1.text-center.mb-3
                         span.px-4.bg-warning.text-black Prize
                     #card.m-auto.rounded-2
                 #box.my-4
-                    button#continueButton.button.me-4 Continue
-                    button#newGameButton.button NEW GAME
+                    input.mb-4.w-25.p-2#gameCode(style="outline:none !important;" placeholder="Question set's ID")
+                    br
+                    button#newGameButton.button.mb-4 NEW GAME
+                    br
+                    button#continueButton.button Continue
                 a(href="#" style="color: #F9E79F; text-shadow: 0 0 3px black;")#rules Rules
                 .modal.fade#ruleModal(data-bs-backdrop="static")
                     .modal-dialog.modal-dialog-centered
@@ -89,7 +92,7 @@ html(lang="en")
                                     |  Each question, you have only one chance to submit your answer.
                                 p
                                     b 2.
-                                    |  There's an in-game boss for you to fight to defeat. Every acceptable answer will decrease the boss's HP by 100.
+                                    |  There's an in-game boss for you to defeat. Every acceptable answer will decrease the boss's HP by 100.
                                 p
                                     b 3.
                                     |  You cannot win unless you have already defeated the boss. Unit 5's boss has 700 HP so basically you have to answer correctly at least 7/12 questions.
@@ -106,36 +109,44 @@ html(lang="en")
             $(document).ready(() => {
                 
                 try {
-                    let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
-                    let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
-                    let set = localStorage.getItem('set');
-                    let hp = parseInt(localStorage.getItem('hp'));
+                    const runTest = () => {
+                        let scoreboard = JSON.parse(localStorage.getItem('scoreboard'));
+                        let lastQuestion = parseInt(localStorage.getItem('lastQuestion'));
+                        let set = localStorage.getItem('set');
+                        let hp = parseInt(localStorage.getItem('hp'));
 
-                    if(!scoreboard || !Number.isInteger(lastQuestion) || !set || !Number.isInteger(hp)) {
-                        document.title = "ERROR";
-                        return $('#continueButton').prop('disabled', true);
-                    }
-
-                    $.get('/questionSet/' + set +'.json', (res) => {
-                        if(lastQuestion + 1 > res.set.length) {
-                            return $('#continueButton').click(() => {
-                                window.location = '/summary';
-                            });
+                        if(!scoreboard || !Number.isInteger(lastQuestion) || !set || !Number.isInteger(hp)) {
+                            return $('#continueButton').prop('disabled', true);
                         }
-                    })
+
+                        $.get('/questionSet/' + set +'.json', (res) => {
+                            if(lastQuestion + 1 > res.set.length) {
+                                $('#continueButton').click(() => {
+                                    window.location = '/summary';
+                                });
+                            }
+                        })
+                    }
+                    runTest();
                 }
-                catch{
-                    console.error;
+                catch(er){
+                    console.log(er);
                 }
                 
                 $('#newGameButton').click(function(){
-                    $('#box').html("<p class='text-center'><span class='p-2 bg-black'>Initializing new game...</span></p>");
-                    localStorage.setItem('lastQuestion', '0');
-                    localStorage.setItem('scoreboard', '{}');
-                    localStorage.setItem('set', 'unit5');
-                    setTimeout(() => {
+                    const qSet = $("#gameCode").val();
+                    $.get('/questionSet/' + qSet +'.json', (res) => {
+                        $('#box').html("<p class='text-center'><span class='p-2 bg-black'>Initializing new game...</span></p>");
+                        localStorage.setItem('lastQuestion', '0');
+                        localStorage.setItem('scoreboard', '{}');
+                        localStorage.setItem('set', qSet);
+                        setTimeout(() => {
                         window.location = '/game';
                     },3000);
+                    }).fail(() => {
+                        alert('This ID is not exist!');
+                    })
+                    
                 });
                 $('#continueButton').click(() => {
                     window.location = '/game';

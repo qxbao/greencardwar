@@ -2,49 +2,49 @@
     "hp" : 700,
     "set" : [
         {
-            "question": "Test question 1",
-            "answer": ["1"],
-            "hint": ""
+            "question": "A school that provides the first part of a child's education, usually for children between five and eleven years old.",
+            "answer": ["elementary school"],
+            "hint": "2 words, 16 letters (space excluded)"
         },
         {
-            "question": "Test question 2",
-            "answer": ["2"],
-            "hint": "2"
+            "question": "To not do something that you were going to do, or to stop doing something before you have completely finished.",
+            "answer": ["drop out"],
+            "hint": "2 words, 7 letters (space excluded)"
         },
         {
-            "question": "Test question 3",
-            "answer": ["3"],
-            "hint": ""
+            "question": "A person whose work is teaching others, or one who is an authority on methods or theories of teaching.",
+            "answer": ["educator"],
+            "hint": "1 word, 8 letters"
         },
         {
-            "question": "Test question 4",
-            "answer": ["4"],
-            "hint": ""
+            "question": "Someone who has agreed to work for a skilled person for a particular period of time and often for low payment, in order to learn that person's skills.",
+            "answer": ["apprentice"],
+            "hint": "1 word, 10 letters"
         },
         {
-            "question": "Test question 5",
-            "answer": ["5"],
-            "hint": "5"
+            "question": "A person's way of thinking and their opinions.",
+            "answer": ["mindset"],
+            "hint": "1 word, 7 letters"
         },
         {
-            "question": "Test question 6",
-            "answer": ["6"],
-            "hint": ""
+            "question": "An effect, a reaction, a connection, a response and/or an experience of customers with each other, with a company or with a brand.",
+            "answer": ["engagement"],
+            "hint": "1 word, 10 letters"
         },
         {
-            "question": "Test question 7",
-            "answer": ["7"],
-            "hint": ""
+            "question": "An occasion or situation that makes it possible to do something that you want to do or have to do, or the possibility of doing something.",
+            "answer": ["opportunity"],
+            "hint": "1 word, 11 letter"
         },
         {
-            "question": "Test question 8",
-            "answer": ["8"],
-            "hint": "8"
+            "question": "Not taking help or money from other people.",
+            "answer": ["independent"],
+            "hint": "1 word, 11 letter"
         },
         {
-            "question": "Test question 9",
-            "answer": ["9"],
-            "hint": ""
+            "question": "A method of learning where students are given freedom in how, what, when and where they learn.",
+            "answer": ["flexible learning"],
+            "hint": "2 words, 16 letters"
         },
         {
             "question": "Test question 10",

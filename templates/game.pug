@@ -201,6 +201,7 @@ html(lang="en")
                                 else {
                                     localStorage.setItem('hp', '0');
                                 }
+                                load();
                                 $('#res').html('');
                                 $('#res').append('<p class="text-congrats">Your answer ('+ answer +') is right, '+name+'!</p>');
                                 await delay(1000);
@@ -209,7 +210,6 @@ html(lang="en")
                                 $('#res').append('<p class="text-congrats">Next question in 5 seconds</p>');
                                 setTimeout(() => {
                                     $('#res').html('');
-                                    load();
                                 },5000)
                                 return true;
                             }
@@ -218,6 +218,7 @@ html(lang="en")
                         localStorage.setItem('lastQuestion', String(lastQuestion + 1));
                         Number.isInteger(scoreboard[name]) ? scoreboard[name] -- : scoreboard[name] = -1;
                         localStorage.setItem('scoreboard', JSON.stringify(scoreboard));
+                        load();
                         $('#res').html('');
                         $('#res').append('<p class="text-red">What a pity, '+name+'! Your answer is totally wrong ( _　_||| )</p>');
                         await delay(1000);
