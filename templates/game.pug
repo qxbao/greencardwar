@@ -185,24 +185,26 @@ html(lang="en")
                     }
                     $.get('/questionSet/' + set +'.json', async (res) => {
                         for(let ans of res.set[lastQuestion].answer) {
+                            let hp = parseInt(localStorage.getItem('hp'));
                             if (ans.toLowerCase() == answer) {
-                                const hp = parseInt(localStorage.getItem('hp'));
                                 localStorage.setItem('lastQuestion', String(lastQuestion + 1));
                                 Number.isInteger(scoreboard[name]) ? scoreboard[name] ++ : scoreboard[name] = 1;
                                 localStorage.setItem('scoreboard', JSON.stringify(scoreboard));
-                                $('#bossImg').attr('src', '/images/boss1_dead.png')
                                 if (hp > 0) {
                                     await $('#bossImg').attr('src', '/images/boss1_angry.png');
                                     $('#bossImg').effect("shake", {times:4}, 1000).promise().then(() => {
-                                        $('#bossImg').attr('src', '/images/boss1.png');
+                                        hp = parseInt(localStorage.getItem('hp'));
+                                        hp > 0 ? $('#bossImg').attr('src', '/images/boss1.png') : $('#bossImg').attr('src', '/images/boss1_dead.png');
                                     });
                                     localStorage.setItem('hp', String(hp - 100));
                                 }
                                 else {
                                     localStorage.setItem('hp', '0');
+                                    setHp(0, res.hp);
                                 }
-                                load();
                                 $('#res').html('');
+                                hp = parseInt(localStorage.getItem('hp'));
+                                setHp(hp, res.hp);
                                 $('#res').append('<p class="text-congrats">Your answer ('+ answer +') is right, '+name+'!</p>');
                                 await delay(1000);
                                 $('#res').append('<img src="/images/congrats.jpg" class="w-50">');
@@ -210,7 +212,8 @@ html(lang="en")
                                 $('#res').append('<p class="text-congrats">Next question in 5 seconds</p>');
                                 setTimeout(() => {
                                     $('#res').html('');
-                                },5000)
+                                    load();
+                                },5000);
                                 return true;
                             }
                         }
@@ -218,7 +221,6 @@ html(lang="en")
                         localStorage.setItem('lastQuestion', String(lastQuestion + 1));
                         Number.isInteger(scoreboard[name]) ? scoreboard[name] -- : scoreboard[name] = -1;
                         localStorage.setItem('scoreboard', JSON.stringify(scoreboard));
-                        load();
                         $('#res').html('');
                         $('#res').append('<p class="text-red">What a pity, '+name+'! Your answer is totally wrong ( _　_||| )</p>');
                         await delay(1000);
@@ -229,7 +231,8 @@ html(lang="en")
                         setTimeout(() => {
                             $('#res').html('');
                             load();
-                        },5000)
+                        },5000);
+                        load();
                     })
                 })
             })

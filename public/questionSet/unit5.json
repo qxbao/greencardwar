@@ -47,19 +47,19 @@
             "hint": "2 words, 16 letters"
         },
         {
-            "question": "Test question 10",
-            "answer": ["10"],
-            "hint": ""
+            "question": "A young person between 13 and 19 years old.",
+            "answer": ["Teenager"],
+            "hint": "1 word, 8 letters"
         },
         {
-            "question": "Test question 11",
-            "answer": ["11"],
-            "hint": "11"
+            "question": "A piece of planned work or activity that is finished over a period of time and intended to achieve a particular purpose.",
+            "answer": ["Project"],
+            "hint": "1 word, 7 letters"
         },
         {
-            "question": "Test question 12",
-            "answer": ["12"],
-            "hint": ""
+            "question": "All the courses given in a school, college,.. or a particular course of study in one subject.",
+            "answer": ["curriculum"],
+            "hint": "1 word, 10 letters"
         }
     ] 
 }
